@@ -45,12 +45,11 @@ app.use((req, res, next) => {
 
 // Error Handler
 app.use((err, req, res, next) => {
-  // Only provides full error in development
-  res.locals.message = err.message
-  res.locals.error = req.app.get('env') === 'development' ? err : {}
   // Respond with an error
   res.status(err.status || 500)
-  res.end()
+  res.send({
+    message: err
+  })
 })
 
 module.exports = app
