@@ -159,9 +159,20 @@ app.post('/signup', async (req, res) => {
 })
 
 // GET /logout
-app.get('/logout', (req, res) => {
+app.get('/logout', async (req, res) => {
   console.log(req.body)
-  res.send('Hello from Logout')
+  req.logout(function (err) {
+    if (err) {
+      return next(err)
+    }
+    req.session.destroy(function (err) {
+      if (err) {
+        return next(err)
+      }
+      res.clearCookie('connect.sid')
+      res.send('Logged out')
+    })
+  })
 })
 
 // ::::
