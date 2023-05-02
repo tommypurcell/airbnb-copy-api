@@ -116,17 +116,22 @@ app.patch('/profile', (req, res) => {
 app.post('/login', async (req, res) => {
   try {
     // find user that matches email and password
-    console.log(req.body)
-    let user = await Users.find({
+    let userFound = await Users.findOne({
       email: req.body.email,
       password: req.body.password,
     })
     // check if user exits, meaning it does not equal and empty string
-    if (user != []) {
+    if (!userFound) {
       // #TODO respond with passport
-      res.send(user)
-    } else {
       console.log('Cannot login: User does not exist. Please sign up instead.')
+    } else {
+      console.log(userFound)
+      res.send(userFound)
+      req.login(userFound, (err) => {
+        if (err) {
+          return next(err)
+        }
+      })
     }
   } catch (err) {
     res.send(err)
