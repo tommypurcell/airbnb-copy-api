@@ -7,10 +7,6 @@ const logger = require('morgan')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const { DB_URL } = require('./db')
-const bookings = require('./models/bookings')
-const houses = require('./models/houses')
-const Reviews = require('./models/Reviews')
-const Users = require('./models/users')
 // Build the App
 const app = express()
 
@@ -22,6 +18,7 @@ app.use(
     origin: 'http://localhost:3000',
   })
 )
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -36,6 +33,12 @@ mongoose.connect(
     console.log('Connected to MongoDB')
   }
 )
+
+// Models
+const bookings = require('./models/bookings')
+const houses = require('./models/houses')
+const Reviews = require('./models/Reviews')
+const Users = require('./models/users')
 
 // Security
 require('./express-sessions')(app)
@@ -62,19 +65,32 @@ app.get('/houses/:id', (req, res) => {
 
 // POST /houses
 app.post('/houses', (req, res) => {
-  console.log(req.body)
-  res.send('post from houses')
+  if (req.isAuthenticated()) {
+    console.log(req.body)
+    res.send('post from houses')
+  } else {
+    console.log('not auth')
+    res.send('Not authorized')
+  }
 })
 // PATCH /houses/:id
 app.patch('/houses/:id', (req, res) => {
-  console.log(req.body)
-  res.send('patch from houses with ID')
+  if (req.isAuthenticated()) {
+    console.log(req.body)
+    res.send('patch from houses with ID')
+  } else {
+    res.send('Not authorized')
+  }
 })
 
 // DELETE /houses/:id
 app.delete('/houses/:id', (req, res) => {
-  console.log(req.body)
-  res.send('delete house with id')
+  if (req.isAuthenticated()) {
+    console.log(req.body)
+    res.send('delete from houses with ID')
+  } else {
+    res.send('Not authorized')
+  }
 })
 
 // GET /bookings
@@ -85,8 +101,12 @@ app.get('/bookings', (req, res) => {
 
 // POST /bookings
 app.post('/bookings', (req, res) => {
-  console.log(req.body)
-  res.send('Post /bookings')
+  if (req.isAuthenticated()) {
+    console.log(req.body)
+    res.send('post bookings')
+  } else {
+    res.send('Not authorized')
+  }
 })
 
 // GET /reviews
@@ -97,19 +117,31 @@ app.get('/reviews', (req, res) => {
 
 // POST /reviews
 app.post('/reviews', (req, res) => {
-  console.log(req.body)
-  res.send('Post Reviews')
+  if (req.isAuthenticated()) {
+    console.log(req.body)
+    res.send('post reviews')
+  } else {
+    res.send('Not authorized')
+  }
 })
 
 // GET /profile
 app.get('/profile', (req, res) => {
-  console.log(req.body)
-  res.send('Hello from Profile')
+  if (req.isAuthenticated()) {
+    console.log(req.body)
+    res.send('get profile')
+  } else {
+    res.send('Not authorized')
+  }
 })
 // PATCH /profile
 app.patch('/profile', (req, res) => {
-  console.log(req.body)
-  res.send('Patch Profile')
+  if (req.isAuthenticated()) {
+    console.log(req.body)
+    res.send('patch profile')
+  } else {
+    res.send('Not authorized')
+  }
 })
 
 // POST /login
@@ -124,13 +156,14 @@ app.post('/login', async (req, res) => {
     if (!userFound) {
       // #TODO respond with passport
       console.log('Cannot login: User does not exist. Please sign up instead.')
+      res.send('Cannot login: User does not exist. Please sign up instead.')
     } else {
       console.log(userFound)
-      res.send(userFound)
       req.login(userFound, (err) => {
         if (err) {
           return next(err)
         }
+        res.send(userFound)
       })
     }
   } catch (err) {
@@ -160,7 +193,7 @@ app.post('/signup', async (req, res) => {
 
 // GET /logout
 app.get('/logout', async (req, res) => {
-  console.log(req.body)
+  console.log('ok')
   req.logout(function (err) {
     if (err) {
       return next(err)
