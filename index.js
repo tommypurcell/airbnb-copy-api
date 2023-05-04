@@ -35,8 +35,8 @@ mongoose.connect(
 )
 
 // Models
-const bookings = require('./models/bookings')
-const houses = require('./models/houses')
+const Bookings = require('./models/bookings')
+const Houses = require('./models/houses')
 const Reviews = require('./models/Reviews')
 const Users = require('./models/users')
 
@@ -64,19 +64,28 @@ app.get('/houses/:id', (req, res) => {
 })
 
 // POST /houses
-app.post('/houses', (req, res) => {
-  if (req.isAuthenticated()) {
-    console.log(req.body)
-    res.send('post from houses')
-  } else {
-    console.log('not auth')
-    res.send('Not authorized')
+app.post('/houses', async (req, res) => {
+  try {
+    if (req.isAuthenticated()) {
+      console.log(req.body)
+      // set the host to the authenticated user's ID
+      req.body.host = req.user._id
+      console.log(req.body)
+      let house = await Houses.create(req.body)
+      console.log(req.body)
+      res.send(house)
+    } else {
+      console.log('not auth')
+      res.send('Not authorized')
+    }
+  } catch (err) {
+    console.log(err)
   }
 })
+
 // PATCH /houses/:id
 app.patch('/houses/:id', (req, res) => {
   if (req.isAuthenticated()) {
-    console.log(req.body)
     res.send('patch from houses with ID')
   } else {
     res.send('Not authorized')
@@ -134,6 +143,7 @@ app.get('/profile', (req, res) => {
     res.send('Not authorized')
   }
 })
+
 // PATCH /profile
 app.patch('/profile', (req, res) => {
   if (req.isAuthenticated()) {
