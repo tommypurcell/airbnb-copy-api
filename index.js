@@ -53,14 +53,32 @@ app.get('/', async (req, res) => {
   res.send('Hello from the Airbnb API')
 })
 
-app.get('/houses', (req, res) => {
-  console.log(req.query)
-  res.send('Hello from Houses')
+app.get('/houses', async (req, res) => {
+  try {
+    console.log(req.query)
+    let houses = await Houses.find({
+      location: 'Pattaya',
+    })
+    console.log(houses)
+    res.send('Hello from Houses')
+  } catch (err) {
+    console.log(err)
+  }
 })
 
-app.get('/houses/:id', (req, res) => {
+app.get('/houses/:id', async (req, res) => {
+  // Find the document in the houses collection by _id
   console.log(req.params.id)
-  res.send('Hello from Houses ID')
+  let houseId = req.params.id
+  console.log('houseID ------> ' + houseId)
+
+  // Populate its host field
+  let house = await Houses.findById(houseId).populate('host', 'avatar name')
+  console.log(house)
+
+  console.log('house: ------> ' + house)
+  // Respond with the house object
+  res.send(house)
 })
 
 // POST /houses
@@ -84,6 +102,7 @@ app.post('/houses', async (req, res) => {
 })
 
 // PATCH /houses/:id
+
 app.patch('/houses/:id', (req, res) => {
   if (req.isAuthenticated()) {
     res.send('patch from houses with ID')
