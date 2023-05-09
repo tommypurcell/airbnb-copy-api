@@ -44,7 +44,6 @@ const Users = require('./models/users')
 require('./express-sessions')(app)
 
 // Routes
-
 // ::::
 app.get('/', async (req, res) => {
   console.log(req.query)
@@ -55,12 +54,34 @@ app.get('/', async (req, res) => {
 
 app.get('/houses', async (req, res) => {
   try {
-    console.log(req.query)
-    let houses = await Houses.find({
-      location: 'Pattaya',
-    })
-    console.log(houses)
-    res.send('Hello from Houses')
+    let obj = {}
+    if (req.query.price) {
+      obj.price = {
+        $lte: req.query.price,
+      }
+    }
+    // search bar will only work if it is the exact match of the title
+    if (req.query.search) {
+      obj.title = req.query.search
+    }
+    if (req.query.location) {
+      obj.location = req.query.location
+    }
+    if (req.query.rooms) {
+      obj.rooms = req.query.rooms
+    }
+
+    // search houses if select options are used
+    let houses
+    if (req.query.sort == 1) {
+      houses = await Houses.find(obj).sort('price')
+    } else if (req.query.sort == -1) {
+      houses = await Houses.find(obj).sort('-price')
+    } else {
+      houses = await Houses.find(obj)
+    }
+
+    res.send(houses)
   } catch (err) {
     console.log(err)
   }
@@ -102,7 +123,6 @@ app.post('/houses', async (req, res) => {
 })
 
 // PATCH /houses/:id
-
 app.patch('/houses/:id', (req, res) => {
   if (req.isAuthenticated()) {
     res.send('patch from houses with ID')
@@ -122,18 +142,30 @@ app.delete('/houses/:id', (req, res) => {
 })
 
 // GET /bookings
-app.get('/bookings', (req, res) => {
-  console.log(req.body)
-  res.send('Hello from Bookings')
+app.get('/bookings', async (req, res) => {
+  console.log('house from query', req.query.house)
+  let booking = await Bookings.find({ house: req.query.house })
+  console.log(booking)
+  res.send(booking)
 })
 
 // POST /bookings
-app.post('/bookings', (req, res) => {
-  if (req.isAuthenticated()) {
-    console.log(req.body)
-    res.send('post bookings')
-  } else {
-    res.send('Not authorized')
+app.post('/bookings', async (req, res) => {
+  try {
+    if (req.isAuthenticated()) {
+      // set the author to the authenticated user's ID
+      req.body.author = req.user._id
+      console.log(req.body)
+
+      let booking = await Bookings.create(req.body)
+
+      res.send(booking)
+    } else {
+      console.log('not auth')
+      res.send('Not authorized')
+    }
+  } catch (err) {
+    console.log(err)
   }
 })
 
