@@ -89,15 +89,12 @@ app.get('/houses', async (req, res) => {
 
 app.get('/houses/:id', async (req, res) => {
   // Find the document in the houses collection by _id
-  console.log(req.params.id)
+
   let houseId = req.params.id
-  console.log('houseID ------> ' + houseId)
 
   // Populate its host field
   let house = await Houses.findById(houseId).populate('host', 'avatar name')
-  console.log(house)
 
-  console.log('house: ------> ' + house)
   // Respond with the house object
   res.send(house)
 })
@@ -109,9 +106,9 @@ app.post('/houses', async (req, res) => {
       console.log(req.body)
       // set the host to the authenticated user's ID
       req.body.host = req.user._id
-      console.log(req.body)
+
       let house = await Houses.create(req.body)
-      console.log(req.body)
+
       res.send(house)
     } else {
       console.log('not auth')
@@ -134,7 +131,6 @@ app.patch('/houses/:id', (req, res) => {
 // DELETE /houses/:id
 app.delete('/houses/:id', (req, res) => {
   if (req.isAuthenticated()) {
-    console.log(req.body)
     res.send('delete from houses with ID')
   } else {
     res.send('Not authorized')
@@ -143,9 +139,8 @@ app.delete('/houses/:id', (req, res) => {
 
 // GET /bookings
 app.get('/bookings', async (req, res) => {
-  console.log('house from query', req.query.house)
   let booking = await Bookings.find({ house: req.query.house })
-  console.log(booking)
+
   res.send(booking)
 })
 
@@ -155,7 +150,6 @@ app.post('/bookings', async (req, res) => {
     if (req.isAuthenticated()) {
       // set the author to the authenticated user's ID
       req.body.author = req.user._id
-      console.log(req.body)
 
       let booking = await Bookings.create(req.body)
 
@@ -170,16 +164,22 @@ app.post('/bookings', async (req, res) => {
 })
 
 // GET /reviews
-app.get('/reviews', (req, res) => {
-  console.log(req.body)
-  res.send('Hello from Reviews')
+app.get('/reviews', async (req, res) => {
+  console.log('req query house', req.query)
+  let reviews = await Reviews.find({ house: req.query.house })
+  console.log('req body: ', req)
+  res.send(reviews)
 })
 
 // POST /reviews
-app.post('/reviews', (req, res) => {
+app.post('/reviews', async (req, res) => {
   if (req.isAuthenticated()) {
+    req.body.author = req.user._id
     console.log(req.body)
-    res.send('post reviews')
+
+    let review = await Reviews.create(req.body)
+
+    res.send(review)
   } else {
     res.send('Not authorized')
   }
