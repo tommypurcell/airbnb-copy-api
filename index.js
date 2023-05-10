@@ -189,8 +189,8 @@ app.post('/reviews', async (req, res) => {
 // GET /profile
 app.get('/profile', async (req, res) => {
   if (req.isAuthenticated()) {
-    let currentUser = await Users.findOne(req.user)
-    console.log(currentUser)
+    // find current logged in user by searching database
+    let currentUser = await Users.findById(req.user._id)
     res.send(currentUser)
   } else {
     res.send('Not authorized')
@@ -202,10 +202,11 @@ app.get('/profile', async (req, res) => {
 
 app.patch('/profile', async (req, res) => {
   if (req.isAuthenticated()) {
+    console.log(req.body)
     let currentUser = await Users.findOne(req.user)
     console.log(currentUser)
 
-    let updatedUser = await Users.findOneAndUpdate(req.body, {
+    let updatedUser = await Users.findOneAndUpdate(req.name, req.body, {
       new: true,
     })
 
