@@ -185,11 +185,13 @@ app.post('/reviews', async (req, res) => {
   }
 })
 
+// get current logged in user by searching database
 // GET /profile
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
   if (req.isAuthenticated()) {
-    console.log(req.body)
-    res.send('get profile')
+    let currentUser = await Users.findOne(req.user)
+    console.log(currentUser)
+    res.send(currentUser)
   } else {
     res.send('Not authorized')
   }
