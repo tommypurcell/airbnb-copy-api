@@ -198,10 +198,23 @@ app.get('/profile', async (req, res) => {
 })
 
 // PATCH /profile
-app.patch('/profile', (req, res) => {
+//  Use app.patch /profile route to update the currently logged in user in the database Then respond with the updated user
+
+app.patch('/profile', async (req, res) => {
   if (req.isAuthenticated()) {
-    console.log(req.body)
-    res.send('patch profile')
+    let currentUser = await Users.findOne(req.user)
+    console.log(currentUser)
+
+    let updatedUser = await Users.findOneAndUpdate(req.body, {
+      new: true,
+    })
+
+    // let updatedUser = await Users.findOneAndUpdate(currentUser, req.body, {
+    //   new: true,
+    // })
+    console.log(updatedUser)
+
+    res.send(updatedUser)
   } else {
     res.send('Not authorized')
   }
@@ -288,3 +301,5 @@ app.use((err, req, res, next) => {
 })
 
 module.exports = app
+
+// write a console log hello
