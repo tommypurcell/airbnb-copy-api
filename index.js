@@ -10,12 +10,14 @@ const { DB_URL } = require('./db')
 // Build the App
 const app = express()
 
-// Middleware
-app.use(logger('tiny'))
 app.use(
   cors({
     credentials: true,
-    origin: 'http://localhost:3000',
+    origin: [
+      'https://abb-copy-react.onrender.com',
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ],
   })
 )
 
@@ -191,6 +193,7 @@ app.get('/profile', async (req, res) => {
   if (req.isAuthenticated()) {
     // find current logged in user by searching database
     let currentUser = await Users.findById(req.user._id)
+    console.log(currentUser)
     res.send(currentUser)
   } else {
     res.send('Not authorized')
