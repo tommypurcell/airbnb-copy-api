@@ -14,6 +14,7 @@ app.use(
   cors({
     credentials: true,
     origin: [
+      'https://bejewelled-cendol-bdbb84.netlify.app',
       'https://abb-copy-react.onrender.com',
       'http://localhost:3000',
       'http://localhost:3001',
