@@ -40,7 +40,7 @@ mongoose.connect(
 // Models
 const Bookings = require('./models/bookings')
 const Houses = require('./models/houses')
-const Reviews = require('./models/Reviews')
+const Reviews = require('./models/reviews')
 const Users = require('./models/users')
 
 // Security
