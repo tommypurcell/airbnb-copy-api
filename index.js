@@ -7,6 +7,7 @@ const logger = require('morgan')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const { DB_URL } = require('./db')
+
 // Build the App
 const app = express()
 
@@ -36,15 +37,14 @@ mongoose.connect(
     console.log('Connected to MongoDB')
   }
 )
+// Security
+require('./express-sessions')(app)
 
 // Models
 const Bookings = require('./models/bookings')
 const Houses = require('./models/houses')
 const Reviews = require('./models/reviews')
 const Users = require('./models/users')
-
-// Security
-require('./express-sessions')(app)
 
 // Routes
 // ::::
