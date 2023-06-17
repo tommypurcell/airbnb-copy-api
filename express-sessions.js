@@ -10,9 +10,18 @@ module.exports = (app) => {
     done(null, user._id)
   })
 
-  passport.deserializeUser((obj, done) => {
+  passport.deserializeUser((id, done) => {
+    console.log('In deserializeUser')
+    console.log('id:', id)
+
     Users.findById(id, (err, user) => {
-      done(null, obj)
+      if (err) {
+        console.log('Error in deserializeUser:', err)
+      } else {
+        console.log('User found in deserializeUser:', user)
+      }
+
+      done(err, user)
     })
   })
 

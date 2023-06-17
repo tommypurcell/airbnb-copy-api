@@ -192,13 +192,21 @@ app.post('/reviews', async (req, res) => {
 // get current logged in user by searching database
 // GET /profile
 app.get('/profile', async (req, res) => {
+  console.log('In /profile route')
+  console.log('req.session:', req.session)
+  console.log('req.user:', req.user)
+
   if (req.isAuthenticated()) {
-    console.log(req.user._id)
+    console.log('User is authenticated')
+    console.log('req.user._id:', req.user._id)
+
     // find current logged in user by searching database
     let currentUser = await Users.findById(req.user._id)
-    console.log(currentUser)
+    console.log('currentUser:', currentUser)
+
     res.send(currentUser)
   } else {
+    console.log('User is not authenticated')
     res.send('Not authorized')
   }
 })
