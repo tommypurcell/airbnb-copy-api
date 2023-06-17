@@ -11,6 +11,7 @@ const { DB_URL } = require('./db')
 // Build the App
 const app = express()
 
+// Cors Middlewear
 app.use(
   cors({
     credentials: true,
@@ -192,6 +193,7 @@ app.post('/reviews', async (req, res) => {
 // GET /profile
 app.get('/profile', async (req, res) => {
   if (req.isAuthenticated()) {
+    console.log(req.user._id)
     // find current logged in user by searching database
     let currentUser = await Users.findById(req.user._id)
     console.log(currentUser)

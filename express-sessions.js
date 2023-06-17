@@ -5,13 +5,15 @@ const MongoDBStore = require('connect-mongodb-session')(session)
 const Users = require('./models/users')
 const { DB_URL, SESSION_SECRET } = require('./db')
 
-module.exports = app => {
+module.exports = (app) => {
   passport.serializeUser((user, done) => {
-    done(null, user)
+    done(null, user._id)
   })
 
   passport.deserializeUser((obj, done) => {
-    done(null, obj)
+    Users.findById(id, (err, user) => {
+      done(null, obj)
+    })
   })
 
   passport.use(
@@ -29,7 +31,7 @@ module.exports = app => {
 
   const sessionStore = new MongoDBStore({
     uri: DB_URL,
-    collection: 'sessions'
+    collection: 'sessions',
   })
 
   app.use(
@@ -41,14 +43,14 @@ module.exports = app => {
       unset: 'destroy',
       store: sessionStore,
       cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week in milliseconds
-      }
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week in milliseconds
+      },
     })
   )
 
   app.use(
     passport.initialize({
-      userProperty: 'user'
+      userProperty: 'user',
     })
   )
   app.use(passport.session())
