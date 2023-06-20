@@ -262,23 +262,31 @@ app.patch('/profile', async (req, res) => {
 //   }
 // })
 
-app.post('/login', (req, res, next) => {
-  passport.authenticate('local', (err, user, info) => {
-    if (err) {
-      return next(err)
-    }
-    if (!user) {
-      return res.status(400).send([user, 'Cannot log in', info])
-    }
-
-    req.login(user, (err) => {
-      if (err) {
-        return next(err)
-      }
-
-      return res.send({ user })
+// POST /login
+app.post('/login', async (req, res) => {
+  try {
+    // find user that matches email and password
+    let userFound = await Users.findOne({
+      email: req.body.email,
+      password: req.body.password,
     })
-  })(req, res, next)
+    // check if user exits, meaning it does not equal and empty string
+    if (!userFound) {
+      // #TODO respond with passport
+      console.log('Cannot login: User does not exist. Please sign up instead.')
+      res.send('Cannot login: User does not exist. Please sign up instead.')
+    } else {
+      console.log(userFound)
+      req.login(userFound, (err) => {
+        if (err) {
+          return next(err)
+        }
+        res.send(userFound)
+      })
+    }
+  } catch (err) {
+    res.send(err)
+  }
 })
 
 // POST /signup
@@ -335,5 +343,3 @@ app.use((err, req, res, next) => {
 })
 
 module.exports = app
-
-// write a console log hello
