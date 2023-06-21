@@ -32,6 +32,7 @@ module.exports = (app) => {
     collection: 'sessions',
   })
 
+  // added sameSite and secure to cookie for render.com
   app.use(
     session({
       secret: SESSION_SECRET,
