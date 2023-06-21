@@ -7,22 +7,11 @@ const { DB_URL, SESSION_SECRET } = require('./db')
 
 module.exports = (app) => {
   passport.serializeUser((user, done) => {
-    done(null, user._id)
+    done(null, user)
   })
 
-  passport.deserializeUser((id, done) => {
-    console.log('In deserializeUser')
-    console.log('id:', id)
-
-    Users.findById(id, (err, user) => {
-      if (err) {
-        console.log('Error in deserializeUser:', err)
-      } else {
-        console.log('User found in deserializeUser:', user)
-      }
-
-      done(err, user)
-    })
+  passport.deserializeUser((obj, done) => {
+    done(null, obj)
   })
 
   passport.use(
@@ -53,8 +42,8 @@ module.exports = (app) => {
       store: sessionStore,
       cookie: {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week in milliseconds
-        secure: false, // set this to true in production, if you're using HTTPS
-        sameSite: 'none', // also change this to 'lax' or 'strict' in production
+        sameSite: 'none',
+        secure: true,
       },
     })
   )

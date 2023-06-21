@@ -10,6 +10,7 @@ const { DB_URL } = require('./db')
 
 // Build the App
 const app = express()
+app.set('trust proxy', 1)
 
 // Cors Middlewear
 app.use(
@@ -19,6 +20,7 @@ app.use(
       'https://bejewelled-cendol-bdbb84.netlify.app',
       'https://abb-copy-react.onrender.com',
       'http://localhost:3000',
+      'http://localhost:3000/login',
       'http://localhost:3001',
     ],
   })
@@ -46,6 +48,7 @@ const Bookings = require('./models/bookings')
 const Houses = require('./models/houses')
 const Reviews = require('./models/reviews')
 const Users = require('./models/users')
+const { session } = require('passport')
 
 // Routes
 // ::::
@@ -193,21 +196,23 @@ app.post('/reviews', async (req, res) => {
 // GET /profile
 app.get('/profile', async (req, res) => {
   console.log('In /profile route')
-  console.log('req.session:', req.session)
-  console.log('req.user:', req.user)
 
-  if (req.isAuthenticated()) {
-    console.log('User is authenticated')
-    console.log('req.user._id:', req.user._id)
+  try {
+    if (req.isAuthenticated) {
+      console.log('User is authenticated')
+      // console.log('req.user._id:', req.user._id)
 
-    // find current logged in user by searching database
-    let currentUser = await Users.findById(req.user._id)
-    console.log('currentUser:', currentUser)
+      // find current logged in user by searching database
+      let currentUser = await Users.findOne(req.user)
+      console.log('currentUser:', currentUser)
 
-    res.send(currentUser)
-  } else {
-    console.log('User is not authenticated')
-    res.send('Not authorized')
+      res.send(currentUser)
+    } else {
+      console.log('User is not authenticated')
+      res.send('Not authorized')
+    }
+  } catch (err) {
+    console.log(err)
   }
 })
 
